@@ -1,0 +1,19 @@
+data.json
+data.json.tmp
+.env
+.venv/
+__pycache__/
+*.pyc
+.git/
+*.zip
+
+# Arquivos que não fazem parte da imagem
+.gitlab-ci.yml
+.gitignore
+.dockerignore
+Dockerfile
+docker-compose.yml
+scripts/
+docs/
+README.md
+LICENSE

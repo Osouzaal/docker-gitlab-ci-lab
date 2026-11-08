@@ -1,0 +1,31 @@
+# Pipeline de deploy em runner self-hosted (Windows).
+# A cada push na branch principal: build da imagem, recriação do contêiner e espera pelo healthcheck.
+
+stages:
+  - deploy
+
+variables:
+  APP_VERSION: $CI_COMMIT_SHORT_SHA   # aparece em GET / para provar qual commit está no ar
+
+workflow:
+  rules:
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_PIPELINE_SOURCE == "web"
+
+deploy:
+  stage: deploy
+  tags:
+    - lab-local              # mesma tag informada ao criar o runner
+  resource_group: lab-deploy # nunca dois deploys ao mesmo tempo
+  timeout: 15 minutes
+  environment:
+    name: local
+    url: http://localhost:8080
+  script:
+    # docker-compose (com hífen): o serviço do runner não enxerga o plugin "docker compose".
+    # Veja docs/troubleshooting.md, item 4.
+    - docker-compose build
+    - docker-compose up -d --remove-orphans
+    # Caminho absoluto: o PATH do runner não inclui a pasta do PowerShell. Veja o item 5.
+    - C:\Windows\System32\WindowsPowerShell\v1.0\powershell.exe -NoProfile -ExecutionPolicy Bypass -File scripts/aguardar_saude.ps1
+    - docker image prune -f

@@ -1,0 +1,12 @@
+# Dados gerados em execução
+data.json
+data.json.tmp
+
+# Segredos e ambiente local
+.env
+*.token
+config.toml
+.venv/
+__pycache__/
+*.pyc
+*.zip

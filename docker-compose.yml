@@ -1,0 +1,28 @@
+name: lab
+
+services:
+  app:
+    build:
+      context: .
+      args:
+        APP_VERSION: ${APP_VERSION:-dev}
+    image: lab-app:local
+    container_name: lab-app
+    restart: unless-stopped
+    environment:
+      DATA_PATH: /data/data.json
+      APP_VERSION: ${APP_VERSION:-dev}
+    ports:
+      # Somente o próprio computador acessa. Para acesso remoto, veja "Próximos passos" no README.
+      - "127.0.0.1:8080:8080"
+    volumes:
+      - lab-data:/data
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8080/api/health', timeout=4)"]
+      interval: 15s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+
+volumes:
+  lab-data:
